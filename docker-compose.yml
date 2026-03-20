@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  ic-shalom:
+    build: .
+    container_name: ic-shalom
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ic-shalom.rule=Host(`ic-shalom.com`) || Host(`ic-shalom.mx`) || Host(`ic-shalom.org`)"
+      - "traefik.http.routers.ic-shalom.entrypoints=websecure"
+      - "traefik.http.routers.ic-shalom.tls.certresolver=letsencrypt"
+      - "traefik.http.services.ic-shalom.loadbalancer.server.port=80"
