@@ -125,11 +125,10 @@ export function PhotoCanvas() {
           pointerEvents: 'none',
         }}
       >
-        {canvasPhotos.map((photo, index) => (
+        {canvasPhotos.map((photo) => (
           <PhotoCard
             key={photo.id}
             photo={photo}
-            index={index}
             onClick={() => handlePhotoClick(photo.url)}
           />
         ))}
@@ -291,11 +290,9 @@ export function PhotoCanvas() {
 
 function PhotoCard({
   photo,
-  index,
   onClick,
 }: {
   photo: Photo;
-  index: number;
   onClick: () => void;
 }) {
   return (

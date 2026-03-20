@@ -6,13 +6,6 @@ interface AnimatedLogoProps {
 }
 
 export function AnimatedLogo({ className = '', size = 'lg' }: AnimatedLogoProps) {
-  const sizes = {
-    sm: 'h-16',
-    md: 'h-24',
-    lg: 'h-32',
-    xl: 'h-48',
-  };
-
   return (
     <motion.div
       className={`relative ${className}`}
