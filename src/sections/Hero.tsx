@@ -5,9 +5,9 @@ import AnimatedLogo from '../components/AnimatedLogo';
 
 // Contador autónomo de visitas
 function getAutonomousVisitorCount(): number {
-  const LAUNCH_DATE = new Date('2024-01-01').getTime();
-  const BASE_COUNT = 850;
-  const DAILY_GROWTH = 12;
+  const LAUNCH_DATE = new Date('2025-03-20').getTime(); // Fecha de lanzamiento
+  const BASE_COUNT = 0; // Arranca desde 0
+  const DAILY_GROWTH = 0; // Sin crecimiento artificial
 
   const now = Date.now();
   const daysSinceLaunch = Math.floor((now - LAUNCH_DATE) / (1000 * 60 * 60 * 24));
