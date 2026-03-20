@@ -2,6 +2,24 @@
 
 ## Sitio Web Shalom Iglesia Cristiana
 
+---
+
+## Deployment
+
+**El sitio ya está desplegado con Docker + Traefik.**
+
+Para actualizar en producción:
+```bash
+# En el servidor
+cd IC-SHALOM
+git pull origin main
+docker-compose up -d --build
+```
+
+Dominios configurados: `ic-shalom.com`, `ic-shalom.mx`, `ic-shalom.org`
+
+---
+
 ### Alta Prioridad
 
 - [ ] **Contenido de Ministerios** - Los 8 ministerios muestran "Próximamente"
