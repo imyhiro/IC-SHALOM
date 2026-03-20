@@ -168,8 +168,8 @@ export function ChatBot() {
     <div
       style={{
         position: 'fixed',
-        bottom: '2rem',
-        right: '2rem',
+        bottom: '1rem',
+        right: '1rem',
         zIndex: 9990,
       }}
     >
@@ -182,13 +182,13 @@ export function ChatBot() {
             exit={{ opacity: 0, y: 20, scale: 0.9 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
             style={{
-              position: 'absolute',
+              position: 'fixed',
               bottom: '5rem',
-              right: 0,
+              right: '1rem',
               width: '350px',
               maxWidth: 'calc(100vw - 2rem)',
-              height: '500px',
-              maxHeight: 'calc(100vh - 10rem)',
+              height: '450px',
+              maxHeight: 'calc(100vh - 8rem)',
               background: 'rgba(255, 255, 255, 0.15)',
               backdropFilter: 'blur(20px)',
               border: '1px solid rgba(255, 255, 255, 0.2)',
@@ -367,83 +367,96 @@ export function ChatBot() {
         )}
       </AnimatePresence>
 
-      {/* Botón principal con flamita */}
-      <motion.button
-        onClick={() => {
-          if (isMinimized) {
-            setIsMinimized(false);
-          } else {
-            setIsOpen(!isOpen);
-          }
-        }}
-        style={{
-          width: '60px',
-          height: '60px',
-          borderRadius: '50%',
-          background: 'linear-gradient(135deg, #EA7124, #d4a853)',
-          border: 'none',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 4px 20px rgba(234, 113, 36, 0.4)',
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-        whileHover={{
-          scale: 1.1,
-          boxShadow: '0 6px 30px rgba(234, 113, 36, 0.5)',
-        }}
-        whileTap={{ scale: 0.95 }}
-      >
-        {/* Efecto de pulso */}
-        {!isOpen && (
-          <motion.div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              borderRadius: '50%',
-              background: 'rgba(255, 255, 255, 0.3)',
-            }}
-            animate={{
-              scale: [1, 1.5, 1],
-              opacity: [0.5, 0, 0.5],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
-          />
-        )}
-
-        <AnimatePresence mode="wait">
-          {isOpen ? (
+      {/* Contenedor del botón y texto */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+        {/* Botón principal con flamita */}
+        <motion.button
+          onClick={() => {
+            if (isMinimized) {
+              setIsMinimized(false);
+            } else {
+              setIsOpen(!isOpen);
+            }
+          }}
+          style={{
+            width: '60px',
+            height: '60px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #EA7124, #d4a853)',
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 4px 20px rgba(234, 113, 36, 0.4)',
+            position: 'relative',
+            overflow: 'hidden',
+          }}
+          whileHover={{
+            scale: 1.1,
+            boxShadow: '0 6px 30px rgba(234, 113, 36, 0.5)',
+          }}
+          whileTap={{ scale: 0.95 }}
+        >
+          {/* Efecto de pulso */}
+          {!isOpen && (
             <motion.div
-              key="close"
-              initial={{ rotate: -90, opacity: 0 }}
-              animate={{ rotate: 0, opacity: 1 }}
-              exit={{ rotate: 90, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <X size={28} color="white" />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="flame"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
-                <path d="M12 23C7.58 23 4 19.42 4 15C4 12.17 5.22 9.56 7.38 7.72L8.5 6.78L9.16 8.12C9.64 9.09 10.34 9.93 11.22 10.57L11.5 10.78V10.5C11.5 9.27 11.83 8.06 12.45 7L13.93 4.39L14.67 6.63C15.31 8.54 16.5 10.22 18.08 11.45L18.5 11.78C19.45 12.91 20 14.4 20 15.97C20 19.41 16.42 23 12 23Z" />
-                <path d="M12 21C10.07 21 8.5 19.43 8.5 17.5C8.5 16.13 9.23 14.89 10.37 14.24L11 13.86V14.5C11 15.05 11.18 15.58 11.5 16C11.82 15.58 12 15.05 12 14.5V13.86L12.63 14.24C13.77 14.89 14.5 16.13 14.5 17.5C14.5 19.43 12.93 21 12 21Z" fill="rgba(255,255,255,0.6)" />
-              </svg>
-            </motion.div>
+              style={{
+                position: 'absolute',
+                inset: 0,
+                borderRadius: '50%',
+                background: 'rgba(255, 255, 255, 0.3)',
+              }}
+              animate={{
+                scale: [1, 1.5, 1],
+                opacity: [0.5, 0, 0.5],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }}
+            />
           )}
-        </AnimatePresence>
-      </motion.button>
+
+          <AnimatePresence mode="wait">
+            {isOpen ? (
+              <motion.div
+                key="close"
+                initial={{ rotate: -90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: 90, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <X size={28} color="white" />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="flame"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
+                  <path d="M12 23C7.58 23 4 19.42 4 15C4 12.17 5.22 9.56 7.38 7.72L8.5 6.78L9.16 8.12C9.64 9.09 10.34 9.93 11.22 10.57L11.5 10.78V10.5C11.5 9.27 11.83 8.06 12.45 7L13.93 4.39L14.67 6.63C15.31 8.54 16.5 10.22 18.08 11.45L18.5 11.78C19.45 12.91 20 14.4 20 15.97C20 19.41 16.42 23 12 23Z" />
+                  <path d="M12 21C10.07 21 8.5 19.43 8.5 17.5C8.5 16.13 9.23 14.89 10.37 14.24L11 13.86V14.5C11 15.05 11.18 15.58 11.5 16C11.82 15.58 12 15.05 12 14.5V13.86L12.63 14.24C13.77 14.89 14.5 16.13 14.5 17.5C14.5 19.43 12.93 21 12 21Z" fill="rgba(255,255,255,0.6)" />
+                </svg>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.button>
+
+        {/* Powered by Yhiro */}
+        <span style={{
+          fontSize: '0.55rem',
+          color: 'var(--text-muted)',
+          opacity: 0.6,
+          whiteSpace: 'nowrap',
+        }}>
+          powered by <span style={{ fontWeight: 600, color: 'var(--gold)' }}>Yhiro</span>
+        </span>
+      </div>
     </div>
   );
 }

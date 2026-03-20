@@ -514,3 +514,160 @@ body {
     display: none !important;
   }
 }
+
+/* ============================================
+   MOBILE SPECIFIC ADJUSTMENTS
+   ============================================ */
+
+/* Photo canvas - hide on mobile */
+@media (max-width: 767px) {
+  .photo-canvas-left {
+    display: none !important;
+  }
+
+  /* Full width backgrounds on mobile */
+  .section-bg-mobile-full {
+    background: var(--bg-tertiary) !important;
+  }
+}
+
+/* Modal responsive */
+.modal-content-responsive {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .modal-content-responsive {
+    flex-direction: row;
+    gap: 2rem;
+  }
+}
+
+/* Modal image container */
+.modal-image-container {
+  width: 100%;
+  max-height: 40vh;
+}
+
+@media (min-width: 768px) {
+  .modal-image-container {
+    flex: 0 0 45%;
+    max-height: none;
+  }
+}
+
+/* Modal text container */
+.modal-text-container {
+  width: 100%;
+  padding: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .modal-text-container {
+    flex: 1;
+    padding: 0.5rem 1rem;
+  }
+}
+
+/* Chat button position on mobile */
+@media (max-width: 640px) {
+  .chat-container {
+    bottom: 0.75rem !important;
+    right: 0.75rem !important;
+  }
+
+  .chat-window {
+    width: calc(100vw - 1.5rem) !important;
+    height: calc(100vh - 6rem) !important;
+    bottom: 4.5rem !important;
+    right: 0.75rem !important;
+    border-radius: 1rem !important;
+  }
+
+  .chat-button {
+    width: 50px !important;
+    height: 50px !important;
+  }
+}
+
+/* Navbar mobile */
+@media (max-width: 767px) {
+  .navbar-links {
+    display: none;
+  }
+
+  .navbar-mobile-menu {
+    display: flex;
+  }
+}
+
+@media (min-width: 768px) {
+  .navbar-mobile-menu {
+    display: none;
+  }
+}
+
+/* Contact section mobile adjustments */
+@media (max-width: 767px) {
+  .contact-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .contact-map {
+    min-height: 300px !important;
+  }
+}
+
+/* Footer responsive */
+@media (max-width: 640px) {
+  .footer-logo {
+    height: 5rem !important;
+  }
+
+  .footer-social {
+    gap: 0.75rem !important;
+  }
+
+  .footer-social a {
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+  }
+}
+
+/* Hero buttons stack on mobile */
+@media (max-width: 480px) {
+  .hero-buttons {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+    width: 100%;
+  }
+
+  .hero-buttons > * {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Reduce padding on very small screens */
+@media (max-width: 380px) {
+  .section-responsive {
+    padding: 2rem 0.75rem;
+  }
+
+  .card-responsive {
+    padding: 1rem;
+  }
+}
+
+/* Intercession form responsive */
+@media (max-width: 640px) {
+  .intercession-form {
+    padding: 1.5rem !important;
+  }
+
+  .intercession-textarea {
+    min-height: 100px !important;
+  }
+}

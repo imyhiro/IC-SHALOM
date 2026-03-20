@@ -1,12 +1,30 @@
-import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { MapPin, Phone, Clock, MessageCircle, Navigation } from 'lucide-react';
+import { MapPin, Phone, Clock, MessageCircle, Navigation, X } from 'lucide-react';
 
 export function Contact() {
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
   });
+
+  const [showImageModal, setShowImageModal] = useState(false);
+
+  // Cerrar con tecla Escape
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowImageModal(false);
+    };
+    if (showImageModal) {
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = '';
+    };
+  }, [showImageModal]);
 
   const whatsappNumber = '527773139261';
   const whatsappMessage = encodeURIComponent(
@@ -25,6 +43,49 @@ export function Contact() {
     >
       {/* Background */}
       <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, transparent 0%, transparent 18%, var(--bg-tertiary) 22%, var(--bg-tertiary) 100%)', transition: 'background 0.3s ease' }} />
+
+      {/* Foto decorativa lado izquierdo - altura completa (oculta en móvil) */}
+      <motion.div
+        className="hide-mobile"
+        initial={{ opacity: 0, x: -50 }}
+        animate={inView ? { opacity: 1, x: 0 } : {}}
+        transition={{ duration: 1, delay: 0.3 }}
+        onClick={() => setShowImageModal(true)}
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: '22%',
+          zIndex: 5,
+          overflow: 'hidden',
+          cursor: 'pointer',
+        }}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+      >
+        <img
+          src="/casa.png"
+          alt="Iglesia Shalom"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center',
+            transition: 'transform 0.3s ease',
+          }}
+        />
+        {/* Fade hacia la derecha */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          bottom: 0,
+          width: '40%',
+          background: 'linear-gradient(to right, transparent, var(--bg-tertiary))',
+          pointerEvents: 'none',
+        }} />
+      </motion.div>
 
       <div style={{ maxWidth: '72rem', margin: '0 auto', position: 'relative', zIndex: 10 }}>
         {/* Título */}
@@ -203,6 +264,237 @@ export function Contact() {
           </motion.div>
         </div>
       </div>
+
+      {/* Modal de imagen maximizada */}
+      <AnimatePresence>
+        {showImageModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            onClick={() => setShowImageModal(false)}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0, 0, 0, 0.92)',
+              backdropFilter: 'blur(8px)',
+              zIndex: 9999,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              padding: '2rem',
+            }}
+          >
+            {/* Botón cerrar */}
+            <motion.button
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0 }}
+              transition={{ delay: 0.2 }}
+              onClick={() => setShowImageModal(false)}
+              style={{
+                position: 'absolute',
+                top: '1.5rem',
+                right: '1.5rem',
+                width: '48px',
+                height: '48px',
+                borderRadius: '50%',
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                color: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                e.currentTarget.style.transform = 'scale(1.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+            >
+              <X size={24} />
+            </motion.button>
+
+            {/* Card con marco grande */}
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.5, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 200, damping: 25 }}
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                background: 'linear-gradient(145deg, #1a1a1a 0%, #0a0a0a 100%)',
+                padding: '1rem',
+                borderRadius: '1.5rem',
+                border: '2px solid rgba(212, 168, 83, 0.4)',
+                boxShadow: '0 25px 80px rgba(0, 0, 0, 0.5), 0 0 60px rgba(212, 168, 83, 0.15)',
+                width: '900px',
+                maxWidth: '95vw',
+                maxHeight: '90vh',
+                cursor: 'default',
+                overflowY: 'auto',
+              }}
+            >
+              {/* Marco dorado interior */}
+              <div className="modal-content-responsive" style={{
+                padding: '1rem',
+                background: 'linear-gradient(135deg, rgba(212, 168, 83, 0.25), rgba(234, 113, 36, 0.15))',
+                borderRadius: '1rem',
+                border: '3px solid rgba(212, 168, 83, 0.5)',
+                boxShadow: 'inset 0 0 30px rgba(0,0,0,0.3)',
+              }}>
+                {/* Lado izquierdo - Imagen */}
+                <div className="modal-image-container" style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                }}>
+                  <img
+                    src="/casa.png"
+                    alt="Iglesia Shalom"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      maxHeight: '40vh',
+                      objectFit: 'cover',
+                      borderRadius: '0.5rem',
+                      display: 'block',
+                    }}
+                  />
+                </div>
+
+                {/* Lado derecho - Mensaje de bienvenida */}
+                <motion.div
+                  className="modal-text-container"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <h3 style={{
+                    fontSize: '1.5rem',
+                    fontWeight: 700,
+                    color: 'white',
+                    marginBottom: '0.25rem',
+                    lineHeight: 1.2,
+                  }}>
+                    Bienvenido a <span style={{ color: '#d4a853' }}>Shalom</span>
+                  </h3>
+
+                  <p style={{
+                    color: 'rgba(255, 255, 255, 0.6)',
+                    fontSize: '0.9rem',
+                    marginBottom: '1rem',
+                  }}>
+                    Tu casa de paz
+                  </p>
+
+                  <div style={{
+                    width: '50px',
+                    height: '2px',
+                    background: 'linear-gradient(90deg, #d4a853, #ea7124)',
+                    borderRadius: '2px',
+                    marginBottom: '1rem',
+                  }} />
+
+                  <p style={{
+                    color: 'rgba(255, 255, 255, 0.85)',
+                    fontSize: '0.9rem',
+                    lineHeight: 1.6,
+                    marginBottom: '0.75rem',
+                  }}>
+                    No importa lo que estés atravesando hoy, hay esperanza.
+                    Dios tiene un plan de bien para tu vida, y este es el lugar
+                    donde puedes encontrar descanso para tu alma.
+                  </p>
+
+                  <p style={{
+                    color: 'rgba(255, 255, 255, 0.85)',
+                    fontSize: '0.9rem',
+                    lineHeight: 1.6,
+                    marginBottom: '1rem',
+                  }}>
+                    Aquí no hay juicio, solo amor. Aquí no hay extraños,
+                    solo familia que aún no conocías. Ven tal como eres,
+                    y descubre la paz que solo Dios puede dar.
+                  </p>
+
+                  {/* Versículo destacado */}
+                  <div style={{
+                    background: 'rgba(0, 0, 0, 0.3)',
+                    borderLeft: '3px solid #d4a853',
+                    padding: '0.75rem 1rem',
+                    borderRadius: '0 0.5rem 0.5rem 0',
+                  }}>
+                    <p style={{
+                      color: 'white',
+                      fontSize: '0.85rem',
+                      fontStyle: 'italic',
+                      lineHeight: 1.5,
+                      marginBottom: '0.25rem',
+                    }}>
+                      "Tú guardarás en completa paz a aquel cuyo pensamiento en ti persevera; porque en ti ha confiado."
+                    </p>
+                    <p style={{
+                      color: '#d4a853',
+                      fontSize: '0.8rem',
+                      fontWeight: 600,
+                    }}>
+                      — Isaías 26:3
+                    </p>
+                  </div>
+
+                  <p style={{
+                    color: 'rgba(255, 255, 255, 0.4)',
+                    fontSize: '0.8rem',
+                    marginTop: '0.75rem',
+                    textAlign: 'center',
+                  }}>
+                    שָׁלוֹם — Shalom: Paz completa
+                  </p>
+                </motion.div>
+              </div>
+            </motion.div>
+
+            {/* Indicador ESC */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              style={{
+                position: 'absolute',
+                bottom: '2rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                color: 'rgba(255, 255, 255, 0.4)',
+                fontSize: '0.8rem',
+              }}
+            >
+              <span style={{
+                padding: '4px 8px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                borderRadius: '4px',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                fontFamily: 'monospace',
+              }}>
+                ESC
+              </span>
+              <span>o click para cerrar</span>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

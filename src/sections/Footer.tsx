@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Facebook, Instagram, Youtube, Heart } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 const socialLinks = [
   {
@@ -21,6 +22,7 @@ const socialLinks = [
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
+  const { theme } = useTheme();
 
   return (
     <footer style={{ position: 'relative', padding: '3rem 1.5rem', borderTop: '1px solid var(--border-color)' }}>
@@ -30,13 +32,19 @@ export function Footer() {
       <div style={{ maxWidth: '72rem', margin: '0 auto', position: 'relative', zIndex: 10 }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}>
           {/* Logo y slogan */}
-          <div style={{ textAlign: 'center' }}>
+          <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <img
               src="/logo.png"
               alt="Shalom Iglesia Cristiana"
-              style={{ height: '3rem', width: 'auto', marginBottom: '0.75rem' }}
+              style={{
+                height: '8rem',
+                width: 'auto',
+                marginBottom: '-2.5rem',
+                filter: theme === 'dark' ? 'invert(1) brightness(1.2)' : 'none',
+                transition: 'filter 0.3s ease',
+              }}
             />
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Una casa para todos</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: '1rem', textAlign: 'center' }}>Una casa para todos</p>
           </div>
 
           {/* Redes sociales */}
