@@ -46,3 +46,58 @@ export async function submitPrayerPetition(petition: Omit<PrayerPetition, 'id' |
 
   return { success: true, data };
 }
+
+// Function to get and increment visitor count
+export async function getVisitorCount(): Promise<number> {
+  if (!supabase) {
+    // Return a simulated count when Supabase is not configured
+    return 1247;
+  }
+
+  try {
+    // Increment the counter
+    const { data, error } = await supabase
+      .rpc('increment_visitor_count');
+
+    if (error) {
+      console.error('Error getting visitor count:', error);
+      // Return cached count or default
+      const cached = localStorage.getItem('visitor_count');
+      return cached ? parseInt(cached) : 1000;
+    }
+
+    // Cache the count
+    if (data) {
+      localStorage.setItem('visitor_count', data.toString());
+    }
+
+    return data || 1000;
+  } catch (err) {
+    console.error('Error:', err);
+    return 1000;
+  }
+}
+
+// Function to just get the count without incrementing
+export async function getVisitorCountOnly(): Promise<number> {
+  if (!supabase) {
+    return 1247;
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('visitor_counter')
+      .select('count')
+      .eq('id', 1)
+      .single();
+
+    if (error) {
+      const cached = localStorage.getItem('visitor_count');
+      return cached ? parseInt(cached) : 1000;
+    }
+
+    return data?.count || 1000;
+  } catch (err) {
+    return 1000;
+  }
+}

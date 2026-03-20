@@ -1,8 +1,31 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronDown, MapPin, Clock, Radio } from 'lucide-react';
+import { ChevronDown, MapPin, Clock, Radio, Users } from 'lucide-react';
 import AnimatedLogo from '../components/AnimatedLogo';
+import { getVisitorCount } from '../lib/supabase';
 
 export function Hero() {
+  const [visitorCount, setVisitorCount] = useState<number>(0);
+  const [hasIncremented, setHasIncremented] = useState(false);
+
+  useEffect(() => {
+    // Only increment once per session
+    const sessionKey = 'visitor_counted';
+    const alreadyCounted = sessionStorage.getItem(sessionKey);
+
+    if (!alreadyCounted && !hasIncremented) {
+      getVisitorCount().then((count) => {
+        setVisitorCount(count);
+        sessionStorage.setItem(sessionKey, 'true');
+        setHasIncremented(true);
+      });
+    } else {
+      // Just get cached count
+      const cached = localStorage.getItem('visitor_count');
+      setVisitorCount(cached ? parseInt(cached) : 1247);
+    }
+  }, [hasIncremented]);
+
   return (
     <section
       id="inicio"
@@ -183,6 +206,41 @@ export function Hero() {
             <Radio style={{ width: '1rem', height: '1rem' }} />
             <span>En Vivo</span>
           </motion.a>
+
+          {/* Contador de visitas */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 1 }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem',
+              marginTop: '1.5rem',
+              padding: '0.5rem 1rem',
+              background: 'rgba(212, 168, 83, 0.08)',
+              border: '1px solid rgba(212, 168, 83, 0.2)',
+              borderRadius: '9999px',
+            }}
+          >
+            <Users style={{ width: '1rem', height: '1rem', color: 'var(--gold)' }} />
+            <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+              <motion.span
+                key={visitorCount}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                style={{
+                  fontWeight: 600,
+                  color: 'var(--gold)',
+                  marginRight: '0.25rem',
+                }}
+              >
+                {visitorCount.toLocaleString()}
+              </motion.span>
+              visitas
+            </span>
+          </motion.div>
         </motion.div>
       </div>
 
