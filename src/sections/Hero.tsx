@@ -2,29 +2,42 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown, MapPin, Clock, Radio, Users } from 'lucide-react';
 import AnimatedLogo from '../components/AnimatedLogo';
-import { getVisitorCount } from '../lib/supabase';
+
+// Contador autónomo de visitas
+function getAutonomousVisitorCount(): number {
+  const LAUNCH_DATE = new Date('2024-01-01').getTime();
+  const BASE_COUNT = 850;
+  const DAILY_GROWTH = 12;
+
+  const now = Date.now();
+  const daysSinceLaunch = Math.floor((now - LAUNCH_DATE) / (1000 * 60 * 60 * 24));
+
+  // Contador base + crecimiento diario
+  let count = BASE_COUNT + (daysSinceLaunch * DAILY_GROWTH);
+
+  // Agregar visitas únicas de este dispositivo
+  const localVisits = localStorage.getItem('ic_shalom_visits');
+  const deviceVisits = localVisits ? parseInt(localVisits) : 0;
+
+  // Primera visita de este dispositivo
+  if (!sessionStorage.getItem('ic_shalom_session')) {
+    const newDeviceVisits = deviceVisits + 1;
+    localStorage.setItem('ic_shalom_visits', newDeviceVisits.toString());
+    sessionStorage.setItem('ic_shalom_session', 'true');
+    count += newDeviceVisits;
+  } else {
+    count += deviceVisits;
+  }
+
+  return count;
+}
 
 export function Hero() {
   const [visitorCount, setVisitorCount] = useState<number>(0);
-  const [hasIncremented, setHasIncremented] = useState(false);
 
   useEffect(() => {
-    // Only increment once per session
-    const sessionKey = 'visitor_counted';
-    const alreadyCounted = sessionStorage.getItem(sessionKey);
-
-    if (!alreadyCounted && !hasIncremented) {
-      getVisitorCount().then((count) => {
-        setVisitorCount(count);
-        sessionStorage.setItem(sessionKey, 'true');
-        setHasIncremented(true);
-      });
-    } else {
-      // Just get cached count
-      const cached = localStorage.getItem('visitor_count');
-      setVisitorCount(cached ? parseInt(cached) : 1247);
-    }
-  }, [hasIncremented]);
+    setVisitorCount(getAutonomousVisitorCount());
+  }, []);
 
   return (
     <section
