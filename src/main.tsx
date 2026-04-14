@@ -11,10 +11,11 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<App />} />
+        <Route path="/" element={<LandingV3 />} />
         <Route path="/v1" element={<LandingV1 />} />
         <Route path="/v2" element={<LandingV2 />} />
         <Route path="/v3" element={<LandingV3 />} />
+        <Route path="/v4" element={<App />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,
