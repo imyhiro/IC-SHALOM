@@ -10,11 +10,13 @@ interface CMSData {
   loaded: boolean;
 }
 
-const CMSContext = createContext<CMSData>({
-  carousel: [], anuncios: [], contenido: {}, loaded: false,
+const CMSContext = createContext<{ data: CMSData; update: (key: string, value: string) => void }>({
+  data: { carousel: [], anuncios: [], contenido: {}, loaded: false },
+  update: () => {},
 });
 
-const useCMS = () => useContext(CMSContext);
+const useCMS = () => useContext(CMSContext).data;
+const useCMSUpdate = () => useContext(CMSContext).update;
 
 /* ─── Theme ─── */
 const LIGHT = {
@@ -153,7 +155,7 @@ export default function Landing() {
   }, []);
 
   return (
-    <CMSContext.Provider value={cms}>
+    <CMSContext.Provider value={{ data: cms, update: (key, val) => setCms(prev => ({ ...prev, contenido: { ...prev.contenido, [key]: val } })) }}>
       <div style={{ fontFamily: "'Inter', system-ui, sans-serif", background: t.bg, color: t.text, transition: 'background 0.3s, color 0.3s' }}>
         {/* ── Navbar ── */}
         <nav
@@ -321,47 +323,51 @@ export default function Landing() {
   );
 }
 
-/* ─── Live check via YouTube API ─── */
+/* ─── Live check: RSS (gratis) + videos API (1 unidad por llamada) ─── */
 const YT_API_KEY = 'AIzaSyAd6Q6DricJ7hcUca2i3-a530g5Y59z1P8';
 const YT_CHANNEL_ID = 'UCHhNYVMIF5ix4CmRNa1YmMQ';
-
-// Override temporal: forzar live cuando la API tiene cuota agotada. Poner null para usar API.
-const FORCE_LIVE_VIDEO_ID: string | null = 'RiahYtCLuDg';
+// Override temporal: usa window.__LIVE_VIDEO_ID del index.html, o null para detección automática.
+const FORCE_LIVE_VIDEO_ID: string | null = (window as any).__LIVE_VIDEO_ID || null;
 
 function useIsLive() {
   const [isLive, setIsLive] = useState(!!FORCE_LIVE_VIDEO_ID);
   const [liveVideoId, setLiveVideoId] = useState<string | null>(FORCE_LIVE_VIDEO_ID);
 
   useEffect(() => {
-    if (FORCE_LIVE_VIDEO_ID) return; // Override activo, no consultar API
+    if (FORCE_LIVE_VIDEO_ID) {
+      if (supabase) {
+        supabase.from('contenido').update({ valor: FORCE_LIVE_VIDEO_ID }).eq('clave', 'youtube_video_id');
+      }
+      return;
+    }
+
+    // Detección de live solo domingos 12:30-15:30
     const check = async () => {
-      // Solo checa domingos entre 8:00-17:00 hora México para no gastar API
       const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Mexico_City' }));
       const day = now.getDay();
       const totalMin = now.getHours() * 60 + now.getMinutes();
-      if (day !== 0 || totalMin < 480 || totalMin > 1020) {
+      if (day !== 0 || totalMin < 750 || totalMin > 930) {
         setIsLive(false);
         return;
       }
 
       try {
-        // Buscar live real
         let res = await fetch(
           `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${YT_CHANNEL_ID}&eventType=live&type=video&key=${YT_API_KEY}`
         );
         let data = await res.json();
-        // Si no hay live, buscar upcoming (premieres)
+
         if (!data.items?.length) {
           res = await fetch(
             `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${YT_CHANNEL_ID}&eventType=upcoming&type=video&key=${YT_API_KEY}`
           );
           data = await res.json();
         }
+
         if (data.items?.length > 0) {
           const videoId = data.items[0].id.videoId;
           setIsLive(true);
           setLiveVideoId(videoId);
-          // Auto-guardar como última predicación en Supabase
           if (supabase && videoId) {
             supabase.from('contenido').update({ valor: videoId }).eq('clave', 'youtube_video_id');
           }
@@ -374,7 +380,7 @@ function useIsLive() {
     };
 
     check();
-    const timer = setInterval(check, 120000); // checa cada 2 minutos
+    const timer = setInterval(check, 600000);
     return () => clearInterval(timer);
   }, []);
 
@@ -449,6 +455,7 @@ function Hero() {
         display: 'flex', flexDirection: 'column', alignItems: 'center',
         justifyContent: isLive ? 'flex-start' : 'center',
         padding: isLive ? '6rem 2rem 0' : '0 2rem', textAlign: 'center',
+        pointerEvents: isLive ? 'none' : 'auto',
       }}>
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }}>
           {isLive && (
@@ -972,7 +979,27 @@ function Donativos() {
 /* ─── Footer ─── */
 function Footer({ theme: t }: { theme: Theme }) {
   const cms = useCMS();
+  const updateCMSFooter = useCMSUpdate();
   const videoId = cms.contenido.youtube_video_id;
+
+  // Al montar, obtener último video vía RSS (gratis, sin cuota)
+  useEffect(() => {
+    (async () => {
+      try {
+        const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${YT_CHANNEL_ID}`;
+        const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(rssUrl)}`);
+        const xml = await res.text();
+        const match = xml.match(/<yt:videoId>([^<]+)<\/yt:videoId>/);
+        if (match?.[1]) {
+          const latestId = match[1];
+          updateCMSFooter('youtube_video_id', latestId);
+          if (supabase) {
+            supabase.from('contenido').update({ valor: latestId }).eq('clave', 'youtube_video_id');
+          }
+        }
+      } catch { /* silenciar */ }
+    })();
+  }, []);
 
   return (
     <footer style={{ padding: '3rem 2rem 1.5rem', background: t.footerBg, borderTop: `1px solid ${t.border}`, transition: 'all 0.3s' }}>
