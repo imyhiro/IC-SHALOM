@@ -979,8 +979,8 @@ function Donativos() {
 /* ─── Footer ─── */
 function Footer({ theme: t }: { theme: Theme }) {
   const cms = useCMS();
-  const updateCMSFooter = useCMSUpdate();
-  const videoId = cms.contenido.youtube_video_id;
+  const fallbackVideoId = cms.contenido.youtube_video_id;
+  const [videoId, setVideoId] = useState<string | null>(null);
 
   // Al montar, obtener último video vía RSS (gratis, sin cuota)
   useEffect(() => {
@@ -991,22 +991,23 @@ function Footer({ theme: t }: { theme: Theme }) {
         const xml = await res.text();
         const match = xml.match(/<yt:videoId>([^<]+)<\/yt:videoId>/);
         if (match?.[1]) {
-          const latestId = match[1];
-          updateCMSFooter('youtube_video_id', latestId);
+          setVideoId(match[1]);
           if (supabase) {
-            supabase.from('contenido').update({ valor: latestId }).eq('clave', 'youtube_video_id');
+            supabase.from('contenido').update({ valor: match[1] }).eq('clave', 'youtube_video_id');
           }
         }
       } catch { /* silenciar */ }
     })();
   }, []);
 
+  const displayVideoId = videoId || fallbackVideoId;
+
   return (
     <footer style={{ padding: '3rem 2rem 1.5rem', background: t.footerBg, borderTop: `1px solid ${t.border}`, transition: 'all 0.3s' }}>
       <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
 
         {/* Última predicación */}
-        {videoId && (
+        {displayVideoId && (
           <div id="ultima-predica" style={{ width: '100%', maxWidth: '500px', textAlign: 'center', scrollMarginTop: '7rem' }}>
             <p style={{
               fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.15em',
@@ -1019,7 +1020,7 @@ function Footer({ theme: t }: { theme: Theme }) {
               overflow: 'hidden', background: '#000',
             }}>
               <iframe
-                src={`https://www.youtube.com/embed/${videoId}`}
+                src={`https://www.youtube.com/embed/${displayVideoId}`}
                 title="Última predicación"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
