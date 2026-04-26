@@ -16,7 +16,6 @@ const CMSContext = createContext<{ data: CMSData; update: (key: string, value: s
 });
 
 const useCMS = () => useContext(CMSContext).data;
-const useCMSUpdate = () => useContext(CMSContext).update;
 
 /* ─── Theme ─── */
 const LIGHT = {
