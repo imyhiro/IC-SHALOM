@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronDown, MapPin, Clock, Radio, Users } from 'lucide-react';
+import { ChevronDown, Radio, Users } from 'lucide-react';
 import AnimatedLogo from '../components/AnimatedLogo';
 
 // Contador autónomo de visitas
@@ -91,7 +91,24 @@ export function Hero() {
           <AnimatedLogo size="xl" className="mx-auto" />
         </div>
 
-        {/* Slogan */}
+        {/* Subtítulo */}
+        <motion.p
+          style={{
+            fontSize: 'clamp(0.7rem, 1.5vw, 0.85rem)',
+            fontWeight: 500,
+            letterSpacing: '0.25em',
+            textTransform: 'uppercase',
+            color: 'var(--text-muted)',
+            marginBottom: '1rem',
+          }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+        >
+          Iglesia Cristiana Shalom · Cuernavaca
+        </motion.p>
+
+        {/* Título */}
         <motion.h1
           style={{
             fontSize: 'clamp(2rem, 8vw, 4.5rem)',
@@ -103,34 +120,53 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
         >
-          <span style={{ color: 'var(--text-primary)' }}>Una casa para </span>
-          <span className="text-gradient-gold">todos</span>
+          <span style={{ color: 'var(--text-primary)' }}>¡Bienvenido a </span>
+          <span className="text-gradient-gold">Shalom!</span>
         </motion.h1>
 
-        {/* Horarios */}
-        <motion.div
+        {/* Descripción */}
+        <motion.p
           style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '1rem',
-            marginBottom: '2rem',
+            fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
             color: 'var(--text-muted)',
+            maxWidth: '28rem',
+            margin: '0 auto 1.5rem',
+            lineHeight: 1.6,
           }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Clock style={{ width: '1.25rem', height: '1.25rem', color: 'var(--gold)' }} />
-            <span>Domingos 9:00 | 11:00 | 13:00 hrs</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <MapPin style={{ width: '1.25rem', height: '1.25rem', color: 'var(--gold)' }} />
-            <span>Cuernavaca, Morelos</span>
-          </div>
-        </motion.div>
+          Hay un lugar para ti. Creemos en la restauración de la persona y la familia
+        </motion.p>
+
+        {/* Reuniones Generales */}
+        <h2 style={{
+          fontSize: '2rem',
+          fontWeight: 900,
+          color: 'red',
+          margin: '1rem 0',
+          background: 'white',
+          padding: '10px',
+        }}>
+          REUNIONES GENERALES
+        </h2>
+
+        {/* Horarios */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '1.5rem',
+          marginBottom: '2rem',
+          color: 'var(--text-muted)',
+          fontSize: '0.9rem',
+          fontWeight: 500,
+        }}>
+          <span>DOM 9AM</span>
+          <span>DOM 11AM</span>
+          <span>DOM 1PM</span>
+        </div>
 
         {/* Botones */}
         <motion.div
@@ -152,15 +188,15 @@ export function Hero() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              Visítanos
+              Soy nuevo
             </motion.a>
             <motion.a
-              href="#intercesion"
+              href="#dar"
               className="btn-secondary"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              Deja tu petición
+              Dar
             </motion.a>
           </div>
 
