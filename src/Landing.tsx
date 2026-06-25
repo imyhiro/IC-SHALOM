@@ -389,73 +389,99 @@ function useIsLive() {
   return { isLive, liveVideoId };
 }
 
-/* ─── Hero Carousel ─── */
+/* ─── Hero Video ─── */
 function Hero() {
   const cms = useCMS();
-  const images = cms.carousel;
-  const [current, setCurrent] = useState(0);
   const { isLive, liveVideoId } = useIsLive();
+  const [muted, setMuted] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
-  useEffect(() => {
-    if (!images.length || isLive) return;
-    const timer = setInterval(() => {
-      setCurrent(c => (c + 1) % images.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [images.length, isLive]);
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !muted;
+      setMuted(!muted);
+    }
+  };
 
   const c = cms.contenido;
   const titulo = c.hero_titulo || 'Hay un lugar para ti';
   const subtitulo = c.hero_subtitulo || 'En Shalom, todos son bienvenidos. 30 años restaurando familias en Cuernavaca.';
   const horarios = c.horarios ? c.horarios.split(',') : ['DOM 9AM', 'DOM 11AM', 'DOM 1PM'];
 
-  if (!images.length && !isLive) return null;
-
   return (
-    <section id="inicio" style={{ position: 'relative', height: '100vh', overflow: 'hidden' }}>
-      {/* Live stream or carousel */}
+    <section id="inicio" style={{
+      position: 'relative',
+      height: '100vh',
+      overflow: 'hidden',
+    }}>
+      {/* Live stream o video de fondo */}
       {isLive ? (
         <iframe
           src={`https://www.youtube.com/embed/${liveVideoId}?autoplay=1`}
           title="En Vivo - IC Shalom"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
-          style={{
-            position: 'absolute', inset: 0, width: '100%', height: '100%',
-            border: 'none', zIndex: 0,
-          }}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none', zIndex: 0 }}
         />
       ) : (
-        <AnimatePresence mode="wait">
-          <motion.img
-            key={current}
-            src={images[current].src}
-            alt={images[current].alt}
-            initial={{ opacity: 0, scale: 1.1 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1 }}
-            style={{
-              position: 'absolute', inset: 0, width: '100%', height: '100%',
-              objectFit: 'cover', filter: 'brightness(0.35)',
-            }}
-          />
-        </AnimatePresence>
+        <video
+          ref={videoRef}
+          autoPlay muted loop playsInline
+          style={{
+            position: 'absolute', inset: 0, width: '100%', height: '100%',
+            objectFit: 'cover', filter: 'brightness(0.65)',
+          }}
+        >
+          <source src="/videos/hero.mp4" type="video/mp4" />
+        </video>
       )}
 
+      {/* Botón mute/unmute */}
+      {!isLive && (
+        <button
+          onClick={toggleMute}
+          style={{
+            position: 'absolute', bottom: '2rem', right: '2rem', zIndex: 3,
+            background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.3)',
+            borderRadius: '50%', width: '2.75rem', height: '2.75rem',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', color: '#fff', transition: 'all 0.3s',
+            backdropFilter: 'blur(4px)',
+          }}
+          title={muted ? 'Activar sonido' : 'Silenciar'}
+        >
+          {muted ? (
+            /* Muted icon */
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
+            </svg>
+          ) : (
+            /* Unmuted icon */
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            </svg>
+          )}
+        </button>
+      )}
+
+      {/* Overlay gradiente */}
       <div style={{
         position: 'absolute', inset: 0,
         background: isLive
           ? 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.5) 100%)'
-          : 'linear-gradient(to bottom, rgba(139,111,71,0.15), rgba(0,0,0,0.4))',
+          : 'linear-gradient(to bottom, rgba(139,111,71,0.08), rgba(0,0,0,0.3))',
         zIndex: 1, pointerEvents: 'none',
       }} />
 
+      {/* Contenido */}
       <div style={{
         position: 'relative', zIndex: 2, height: '100%',
         display: 'flex', flexDirection: 'column', alignItems: 'center',
         justifyContent: isLive ? 'flex-start' : 'center',
-        padding: isLive ? '6rem 2rem 0' : '0 2rem', textAlign: 'center',
+        padding: isLive ? '3rem 2rem 0' : '0 2rem', textAlign: 'center',
         pointerEvents: isLive ? 'none' : 'auto',
       }}>
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }}>
@@ -465,13 +491,8 @@ function Hero() {
               background: 'rgba(239,68,68,0.9)', padding: '0.4rem 1rem',
               borderRadius: '999px', marginBottom: '1rem',
             }}>
-              <span style={{
-                width: '8px', height: '8px', borderRadius: '50%',
-                background: '#fff', animation: 'v2pulse 1.5s infinite',
-              }} />
-              <span style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.1em' }}>
-                EN VIVO
-              </span>
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#fff', animation: 'v2pulse 1.5s infinite' }} />
+              <span style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.1em' }}>EN VIVO</span>
             </div>
           )}
 
@@ -535,23 +556,6 @@ function Hero() {
             </>
           )}
         </motion.div>
-
-        {!isLive && (
-          <div style={{ position: 'absolute', bottom: '2rem', display: 'flex', gap: '0.5rem' }}>
-            {images.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrent(i)}
-                style={{
-                  width: i === current ? '2rem' : '0.5rem', height: '0.5rem',
-                  borderRadius: '999px', border: 'none', cursor: 'pointer',
-                  background: i === current ? '#C8956C' : 'rgba(255,255,255,0.4)',
-                  transition: 'all 0.3s',
-                }}
-              />
-            ))}
-          </div>
-        )}
       </div>
     </section>
   );

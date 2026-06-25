@@ -12,6 +12,12 @@ dist
 dist-ssr
 *.local
 
+# Environment
+.env
+
+# Videos originales pesados (solo conservar .mp4 convertidos)
+public/videos/*.mov
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
