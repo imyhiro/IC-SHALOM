@@ -1099,21 +1099,33 @@ function Donativos() {
 /* ─── Footer ─── */
 function Footer({ theme: t }: { theme: Theme }) {
   const cms = useCMS();
-  const fallbackVideoId = cms.contenido.youtube_video_id;
+  const fallbackVideoId = cms.contenido.youtube_video_id || 'ogl_gnPeMr8';
   const [videoId, setVideoId] = useState<string | null>(null);
 
-  // Al montar, obtener último video vía RSS (gratis, sin cuota)
+  // Al montar, obtener último video vía YouTube API (playlist de uploads, 1 unidad de cuota)
+  // Cachea en localStorage 1 hora para no quemar cuota
   useEffect(() => {
     (async () => {
       try {
-        const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${YT_CHANNEL_ID}`;
-        const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(rssUrl)}`);
-        const xml = await res.text();
-        const match = xml.match(/<yt:videoId>([^<]+)<\/yt:videoId>/);
-        if (match?.[1]) {
-          setVideoId(match[1]);
+        const CACHE_KEY = 'ics_latest_video';
+        const CACHE_TTL = 60 * 60 * 1000; // 1 hora
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+          const { id, ts } = JSON.parse(cached);
+          if (Date.now() - ts < CACHE_TTL) { setVideoId(id); return; }
+        }
+        // Uploads playlist: reemplazar "UC" por "UU" en el channel ID
+        const uploadsPlaylist = 'UU' + YT_CHANNEL_ID.slice(2);
+        const res = await fetch(
+          `https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&playlistId=${uploadsPlaylist}&maxResults=1&key=${YT_API_KEY}`
+        );
+        const data = await res.json();
+        const id = data.items?.[0]?.contentDetails?.videoId;
+        if (id) {
+          setVideoId(id);
+          localStorage.setItem(CACHE_KEY, JSON.stringify({ id, ts: Date.now() }));
           if (supabase) {
-            supabase.from('contenido').update({ valor: match[1] }).eq('clave', 'youtube_video_id');
+            supabase.from('contenido').update({ valor: id }).eq('clave', 'youtube_video_id');
           }
         }
       } catch { /* silenciar */ }
